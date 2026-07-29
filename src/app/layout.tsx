@@ -17,7 +17,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Tong Solutions | Premium University Final Year Projects",
   description: "Turn your final year project ideas and requirements into high-quality, submission-ready software systems. Tailored for university students with complete documentation.",
-  keywords: "final year project, university project maker, cs projects, software engineering projects, thesis documentation, Tong Solutions",
+  keywords: "final year projects, university project maker, cs projects, software engineering projects, thesis documentation, Tong Solutions",
   openGraph: {
     title: "Tong Solutions | Premium University Final Year Projects",
     description: "Submit your project ideas and requirements. We help you create high-fidelity final year projects with source code, report documents, and viva preparations.",
