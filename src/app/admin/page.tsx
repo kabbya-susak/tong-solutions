@@ -425,12 +425,6 @@ export default function AdminDashboard() {
               {isAuthenticating ? "Authenticating..." : "🔓 Unlock Admin Panel"}
             </button>
           </form>
-
-          {/* Credentials Helper Badge */}
-          <div style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px dashed var(--glass-border)", textAlign: "center", fontSize: "0.78rem", color: "var(--accent-gold-light)" }}>
-            ℹ️ <strong>Default Credentials:</strong><br />
-            Username: <code style={{ color: "#00F0FF" }}>admin</code> | Password: <code style={{ color: "#00F0FF" }}>tong2026password</code>
-          </div>
         </div>
       </div>
     );
