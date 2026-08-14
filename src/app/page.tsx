@@ -2,6 +2,200 @@
 
 import { useState, useRef, useEffect } from "react";
 
+const PROTOTYPES = [
+  {
+    id: "medai",
+    title: "MedScan AI — Radiographic Chest X-Ray Diagnostic Portal",
+    category: "ai-ml",
+    categoryLabel: "AI & Machine Learning",
+    badge: "HEALTHCARE AI",
+    badgeColor: "var(--accent-cyan)",
+    image: "/prototypes/medai.png",
+    description: "Deep learning ResNet50 model with Grad-CAM heatmap visualization for automated thoracic anomaly detection. Complete with FastAPI backend & Next.js client dashboard.",
+    techStack: ["PyTorch", "Next.js 15", "FastAPI", "TailwindCSS", "Grad-CAM"],
+    deliverables: ["Full Source Code", "45-Page IEEE Book", "Viva Defense Deck", "Dataset Scripts"],
+    metrics: { "Model Accuracy": "96.4%", "Inference Speed": "140ms", "Dataset": "NIH ChestX-ray14" },
+    codeSnippet: [
+      "// PyTorch ResNet50 Classifier Pipeline",
+      "// Dependencies: torch, torchvision.models, torch.nn",
+      "",
+      "class MedScanResNet(nn.Module):",
+      "    def __init__(self, num_classes=14):",
+      "        super(MedScanResNet, self).__init__()",
+      "        self.backbone = models.resnet50(pretrained=True)",
+      "        in_features = self.backbone.fc.in_features",
+      "        self.backbone.fc = nn.Sequential(",
+      "            nn.Linear(in_features, 512),",
+      "            nn.ReLU(),",
+      "            nn.Dropout(0.3),",
+      "            nn.Linear(512, num_classes),",
+      "            nn.Sigmoid()",
+      "        )",
+      "",
+      "    def forward(self, x):",
+      "        return self.backbone(x)"
+    ].join("\n"),
+    architecture: "Multi-stage pipeline: Frontend Next.js client submits DICOM/PNG scans to FastAPI. ResNet50 processes 224x224 tensors and computes Grad-CAM activations overlay on thoracic regions with >96% accuracy."
+  },
+  {
+    id: "iot-agri",
+    title: "AgroIntelligent — Telemetry & Automated Irrigation System",
+    category: "iot",
+    categoryLabel: "IoT & Embedded Systems",
+    badge: "SMART AGRI IOT",
+    badgeColor: "#10B981",
+    image: "/prototypes/iot-agri.png",
+    description: "Multi-node ESP32 soil moisture & climate monitoring with automatic solenoid valve triggering, real-time MQTT telemetry dashboard, and weather prediction API integration.",
+    techStack: ["ESP32 / Arduino", "MQTT", "Node.js", "React / Next.js", "Chart.js"],
+    deliverables: ["Firmware (.ino)", "Circuit Schematic", "Web Dashboard Code", "IEEE Report"],
+    metrics: { "Active Sensor Nodes": "8 Nodes", "System Uptime": "99.9%", "Protocol": "MQTT / WebSockets" },
+    codeSnippet: [
+      "// ESP32 Telemetry & Relay Irrigation Loop",
+      "// Header Includes: WiFi.h, PubSubClient.h",
+      "",
+      "const char* mqtt_server = \"broker.hivemq.com\";",
+      "WiFiClient espClient;",
+      "PubSubClient client(espClient);",
+      "",
+      "void setup() {",
+      "  pinMode(SOIL_PIN, INPUT);",
+      "  pinMode(RELAY_VALVE, OUTPUT);",
+      "  WiFi.begin(SSID, PASSWORD);",
+      "  client.setServer(mqtt_server, 1883);",
+      "}",
+      "",
+      "void loop() {",
+      "  int moisture = analogRead(SOIL_PIN);",
+      "  float pct = map(moisture, 4095, 0, 0, 100);",
+      "  if (pct < 35.0) digitalWrite(RELAY_VALVE, HIGH);",
+      "  char payload[32];",
+      "  snprintf(payload, sizeof(payload), \"{\\\"moisture\\\": %.1f}\", pct);",
+      "  client.publish(\"agro/telemetry/zone1\", payload);",
+      "  delay(2000);",
+      "}"
+    ].join("\n"),
+    architecture: "ESP32 nodes measure soil moisture and humidity, broadcasting JSON telemetry over MQTT to a Node.js broker. Next.js dashboard visualizes real-time gauge metrics and sends manual override signals to relay valves."
+  },
+  {
+    id: "fintech-ai",
+    title: "Synetic Fraud AI — Financial Anomaly & Threat Detection",
+    category: "web",
+    categoryLabel: "Web Applications",
+    badge: "FINTECH & CYBER",
+    badgeColor: "var(--accent-primary)",
+    image: "/prototypes/fintech-ai.png",
+    description: "Real-time transaction fraud scoring platform built with Isolation Forest & XGBoost machine learning pipelines and interactive threat geolocation maps.",
+    techStack: ["Python Scikit-Learn", "FastAPI", "React", "PostgreSQL", "Recharts"],
+    deliverables: ["Full Web App Code", "ML Model Files", "Architecture Diagram", "Slide Deck"],
+    metrics: { "F1-Score": "0.94", "Throughput": "5,000 TPS", "Risk Layers": "4 Security Checks" },
+    codeSnippet: [
+      "# Scikit-Learn Isolation Forest Threat Evaluator",
+      "# Model: IsolationForest(n_estimators=100, contamination=0.02)",
+      "",
+      "def detect_fraud_anomaly(transaction_features):",
+      "    clf = IsolationForest(n_estimators=100, contamination=0.02, random_state=42)",
+      "    clf.fit(X_train_historical)",
+      "    anomaly_score = clf.decision_function(transaction_features)",
+      "    is_fraud = clf.predict(transaction_features) == -1",
+      "    return {",
+      "        \"is_flagged\": bool(is_fraud[0]),",
+      "        \"anomaly_score\": float(anomaly_score[0])",
+      "    }"
+    ].join("\n"),
+    architecture: "FastAPI ingests streaming banking transactions. XGBoost & Isolation Forest evaluate velocity and geolocation deviations in real-time, pushing flagged transactions to PostgreSQL and WebSocket dashboard."
+  },
+  {
+    id: "lms-edu",
+    title: "U.Alma Academic Portal — AI Thesis Reviewer & Plagiarism Shield",
+    category: "web",
+    categoryLabel: "Web Applications",
+    badge: "EDTECH PLATFORM",
+    badgeColor: "var(--accent-gold-light)",
+    image: "/prototypes/lms-edu.png",
+    description: "University LMS with automated assignment submission, AST-based source code similarity analysis, PDF thesis structure reviewer, and Dean's list badge tracking.",
+    techStack: ["Next.js 15", "TypeScript", "Node.js", "Prisma ORM", "Docker"],
+    deliverables: ["Complete Monorepo", "Docker Compose Setup", "40+ Page Book", "Viva Q&A Prep"],
+    metrics: { "Modules": "LMS + Plagiarism", "Similarity Engine": "AST Matching", "Access Control": "RBAC Roles" },
+    codeSnippet: [
+      "// AST Token Fingerprinting Engine",
+      "// Utilities: @babel/parser, @babel/traverse",
+      "",
+      "function generateASTFingerprint(sourceCode: string): string[] {",
+      "  const ast = parser.parse(sourceCode, { sourceType: \"module\", plugins: [\"typescript\"] });",
+      "  const tokens: string[] = [];",
+      "  traverse(ast, {",
+      "    enter(path: any) {",
+      "      tokens.push(path.node.type);",
+      "    }",
+      "  });",
+      "  return tokens;",
+      "}"
+    ].join("\n"),
+    architecture: "Full-stack Next.js App Router with Prisma ORM and PostgreSQL. Assignment submissions run through AST tokenization microservices to detect obfuscated plagiarism across student repositories."
+  },
+  {
+    id: "blockchain-supply",
+    title: "ChainGuard — Blockchain Transparent Supply Chain & Verifier",
+    category: "web",
+    categoryLabel: "Web Applications",
+    badge: "BLOCKCHAIN & WEB3",
+    badgeColor: "#8B5CF6",
+    image: "/prototypes/blockchain-supply.png",
+    description: "Ethereum smart contract NFC/QR verified supply chain provenance tracking system with tamper-evident audit logs and interactive provenance timeline dashboard.",
+    techStack: ["Solidity", "Ethers.js", "Next.js 15", "Hardhat", "IPFS"],
+    deliverables: ["Smart Contracts", "Web App Source Code", "IEEE Paper & Book", "Testnet Deploy Script"],
+    metrics: { "Gas Efficiency": "Low (ERC-721A)", "Verification": "< 500ms", "Audit Score": "100% Security" },
+    codeSnippet: [
+      "// Solidity Supply Chain Item Lifecycle Smart Contract",
+      "// Standards: ERC-721A, OpenZeppelin Ownable",
+      "",
+      "contract ChainGuardProvenance {",
+      "    struct ItemState {",
+      "        string ipfsHash;",
+      "        address currentHolder;",
+      "        uint256 timestamp;",
+      "        bool isVerified;",
+      "    }",
+      "",
+      "    mapping(uint256 => ItemState[]) public itemHistory;",
+      "",
+      "    function recordCheckpoint(uint256 tokenId, string memory hash) public {",
+      "        itemHistory[tokenId].push(ItemState(hash, msg.sender, block.timestamp, true));",
+      "    }",
+      "}"
+    ].join("\n"),
+    architecture: "Next.js Web3 client interacts with deployed Solidity smart contracts on Polygon/Sepolia testnet via Ethers.js. IPFS decentralized storage preserves immutable product certificates and batch telemetry."
+  },
+  {
+    id: "robotics-drone",
+    title: "AeroVision — Autonomous Drone & Edge AI Target Tracking",
+    category: "iot",
+    categoryLabel: "IoT & Embedded Systems",
+    badge: "ROBOTICS & EDGE AI",
+    badgeColor: "#EF4444",
+    image: "/prototypes/robotics-drone.png",
+    description: "NVIDIA Jetson Nano edge AI companion computer with YOLOv8 real-time object tracking, MAVLink flight controller integration, and live thermal telemetry camera stream.",
+    techStack: ["Python OpenCV", "YOLOv8 Edge", "NVIDIA Jetson", "ROS2 / MAVLink", "Flask HD Stream"],
+    deliverables: ["Python Edge Code", "ROS2 Nodes Setup", "Hardware Assembly Guide", "45-Page Book"],
+    metrics: { "FPS on Jetson": "38 FPS", "Latency": "45ms", "Target Recall": "97.8%" },
+    codeSnippet: [
+      "// Edge AI YOLOv8 MAVLink Target Lock Loop",
+      "// Hardware: NVIDIA Jetson Nano + Pixhawk Flight Controller",
+      "",
+      "def drone_vision_tracking_loop():",
+      "    model = YOLO(\"yolov8n_edge.engine\")",
+      "    mav = mavutil.mavlink_connection(\"/dev/ttyTHS1\", baud=57600)",
+      "    while True:",
+      "        frame = cap.read()",
+      "        results = model.predict(frame, conf=0.6)",
+      "        for r in results:",
+      "            dx, dy = calculate_target_offset(r.boxes)",
+      "            mav.send_guided_velocity_cmd(dx, dy, 0.0)"
+    ].join("\n"),
+    architecture: "Onboard NVIDIA Jetson processes 1080p camera frames at 38 FPS with YOLOv8. Bounding box coordinates compute MAVLink velocity vectors sent over UART to Pixhawk flight controller for autonomous target tracking."
+  }
+];
+
 // Interactive HTML5 Canvas Particle Laser Network
 function ArcReactorCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -517,10 +711,285 @@ function WhyTongSolutionsSection({ onOpenModal }: { onOpenModal: () => void }) {
   );
 }
 
+// Interactive Project Prototypes & Web Templates Showcase Component
+function PrototypesShowcaseSection({
+  onOpenModal,
+}: {
+  onOpenModal: (packageName?: string, prototypeTitle?: string, categoryVal?: string) => void;
+}) {
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [activeDemoItem, setActiveDemoItem] = useState<typeof PROTOTYPES[0] | null>(null);
+  const [demoTab, setDemoTab] = useState<"overview" | "architecture" | "code">("overview");
+
+  const demoDialogRef = useRef<HTMLDialogElement>(null);
+
+  const filteredPrototypes = activeCategory === "all"
+    ? PROTOTYPES
+    : PROTOTYPES.filter((p) => p.category === activeCategory);
+
+  const openDemoModal = (item: typeof PROTOTYPES[0]) => {
+    setActiveDemoItem(item);
+    setDemoTab("overview");
+    demoDialogRef.current?.showModal();
+  };
+
+  const closeDemoModal = () => {
+    demoDialogRef.current?.close();
+  };
+
+  return (
+    <section id="prototypes" className="categories-section scanline-bg" style={{ position: "relative", borderTop: "1px solid var(--glass-border)" }}>
+      <div className="container">
+        <header className="section-header">
+          <span className="tong-badge tong-badge-cyan" style={{ marginBottom: "var(--space-xs)" }}>
+            <span>⚡ LIVE PROTOTYPES &amp; TEMPLATE VAULT</span>
+          </span>
+          <h2 className="section-title tong-text-gradient">
+            Explore Project Prototypes &amp; Web Templates
+          </h2>
+          <p className="section-subtitle">
+            Browse real-world software prototypes, system architecture blueprints, and IEEE report templates built for engineering students.
+          </p>
+        </header>
+
+        {/* Category Filter Tabs */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem", flexWrap: "wrap", marginBottom: "var(--space-lg)" }}>
+          {[
+            { id: "all", label: "All Prototypes" },
+            { id: "web", label: "Web Applications" },
+            { id: "ai-ml", label: "AI & Machine Learning" },
+            { id: "iot", label: "IoT & Embedded Systems" },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setActiveCategory(cat.id)}
+              style={{
+                padding: "0.55rem 1.25rem",
+                borderRadius: "20px",
+                border: activeCategory === cat.id ? "1px solid var(--accent-cyan)" : "1px solid var(--glass-border)",
+                background: activeCategory === cat.id ? "rgba(0, 240, 255, 0.15)" : "rgba(13, 17, 23, 0.6)",
+                color: activeCategory === cat.id ? "var(--accent-cyan)" : "var(--text-main)",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                cursor: "pointer",
+                boxShadow: activeCategory === cat.id ? "0 0 15px rgba(0, 240, 255, 0.3)" : "none",
+                transition: "all 0.3s ease",
+              }}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Prototypes Grid */}
+        <div className="prototypes-grid">
+          {filteredPrototypes.map((item) => (
+            <article key={item.id} className="hud-card prototype-card">
+              <div className="hud-corner hud-corner-tl" style={{ borderColor: item.badgeColor }} />
+              <div className="hud-corner hud-corner-tr" style={{ borderColor: item.badgeColor }} />
+              <div className="hud-corner hud-corner-bl" style={{ borderColor: item.badgeColor }} />
+              <div className="hud-corner hud-corner-br" style={{ borderColor: item.badgeColor }} />
+
+              {/* Preview Image Container */}
+              <div className="prototype-img-container">
+                <img src={item.image} alt={item.title} className="prototype-img" />
+                <span
+                  className="tong-badge prototype-overlay-badge"
+                  style={{ background: `${item.badgeColor}25`, borderColor: item.badgeColor, color: item.badgeColor }}
+                >
+                  <span>{item.badge}</span>
+                </span>
+              </div>
+
+              {/* Card Body */}
+              <div className="prototype-body">
+                <h3 style={{ fontSize: "1.2rem", color: "var(--text-main)", marginBottom: "0.5rem", lineHeight: 1.3 }}>
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "0.75rem", lineHeight: 1.5 }}>
+                  {item.description}
+                </p>
+
+                {/* Tech Stack Pills */}
+                <div className="tech-tag-list">
+                  {item.techStack.map((tech) => (
+                    <span key={tech} className="tech-tag">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Deliverable Checklist */}
+                <div style={{ marginTop: "0.5rem", marginBottom: "1rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                  <div style={{ fontWeight: 700, color: "var(--accent-gold-light)", marginBottom: "0.3rem" }}>
+                    🎁 Package Includes:
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem" }}>
+                    {item.deliverables.map((d) => (
+                      <span key={d} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                        <span style={{ color: "#10B981" }}>✓</span> {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="prototype-actions">
+                  <button
+                    type="button"
+                    className="cta-button secondary"
+                    style={{ flex: 1, padding: "0.55rem 0.75rem", fontSize: "0.82rem" }}
+                    onClick={() => openDemoModal(item)}
+                  >
+                    👁️ Live Preview
+                  </button>
+                  <button
+                    type="button"
+                    className="cta-button primary"
+                    style={{ flex: 1, padding: "0.55rem 0.75rem", fontSize: "0.82rem", background: `linear-gradient(135deg, ${item.badgeColor}, var(--accent-primary))` }}
+                    onClick={() => onOpenModal("Complete Solution", item.title, item.category)}
+                  >
+                    ⚡ Request Project
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      {/* Interactive Prototype Live Demo Modal */}
+      <dialog ref={demoDialogRef} id="prototype-demo-dialog" aria-labelledby="demo-dialog-title">
+        {activeDemoItem && (
+          <div style={{ padding: "var(--space-md)" }}>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem", borderBottom: "1px solid var(--glass-border)", paddingBottom: "0.75rem" }}>
+              <div>
+                <span className="tong-badge" style={{ background: `${activeDemoItem.badgeColor}20`, borderColor: activeDemoItem.badgeColor, color: activeDemoItem.badgeColor, marginBottom: "0.4rem" }}>
+                  <span>{activeDemoItem.badge}</span>
+                </span>
+                <h2 id="demo-dialog-title" style={{ fontSize: "1.4rem", color: "var(--text-main)", marginTop: "0.3rem" }}>
+                  {activeDemoItem.title}
+                </h2>
+              </div>
+              <button
+                type="button"
+                className="close-dialog-btn"
+                onClick={closeDemoModal}
+                style={{ fontSize: "1.5rem", cursor: "pointer", background: "none", border: "none", color: "var(--text-muted)" }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Tabs */}
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", borderBottom: "1px solid var(--glass-border)", paddingBottom: "0.5rem" }}>
+              {[
+                { id: "overview", label: "📱 Screen Preview & Metrics" },
+                { id: "architecture", label: "📐 System Architecture" },
+                { id: "code", label: "💻 Code Snippet" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setDemoTab(tab.id as typeof demoTab)}
+                  style={{
+                    padding: "0.4rem 0.9rem",
+                    borderRadius: "6px",
+                    border: "none",
+                    background: demoTab === tab.id ? "rgba(0, 240, 255, 0.15)" : "transparent",
+                    color: demoTab === tab.id ? "var(--accent-cyan)" : "var(--text-muted)",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab 1: Overview & Metrics */}
+            {demoTab === "overview" && (
+              <div>
+                <div style={{ borderRadius: "8px", overflow: "hidden", border: "1px solid var(--glass-border)", marginBottom: "1rem" }}>
+                  <img src={activeDemoItem.image} alt={activeDemoItem.title} style={{ width: "100%", maxHeight: "380px", objectFit: "cover" }} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1rem" }}>
+                  {Object.entries(activeDemoItem.metrics).map(([key, val]) => (
+                    <div key={key} style={{ background: "rgba(0,0,0,0.4)", padding: "0.75rem", borderRadius: "6px", border: "1px solid var(--glass-border)" }}>
+                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{key}</div>
+                      <div style={{ fontSize: "1.1rem", fontWeight: 700, color: activeDemoItem.badgeColor, marginTop: "0.2rem" }}>{val}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2: Architecture */}
+            {demoTab === "architecture" && (
+              <div style={{ background: "rgba(0,0,0,0.3)", padding: "1.25rem", borderRadius: "8px", border: "1px solid var(--glass-border)", marginBottom: "1rem" }}>
+                <h4 style={{ color: "var(--accent-cyan)", marginBottom: "0.5rem" }}>System Dataflow &amp; Module Design</h4>
+                <p style={{ color: "var(--text-main)", lineHeight: 1.6, fontSize: "0.95rem" }}>
+                  {activeDemoItem.architecture}
+                </p>
+                <div style={{ marginTop: "1rem", paddingTop: "0.75rem", borderTop: "1px solid var(--glass-border)", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                  <strong>Included Blueprints:</strong> High-Resolution ERD Diagrams, Component Sequence Flowcharts, and Dataflow Diagrams (DFD Level 0-2).
+                </div>
+              </div>
+            )}
+
+            {/* Tab 3: Code Snippet */}
+            {demoTab === "code" && (
+              <div>
+                <pre
+                  style={{
+                    background: "#080A0F",
+                    border: "1px solid var(--glass-border)",
+                    padding: "1rem",
+                    borderRadius: "8px",
+                    overflowX: "auto",
+                    fontFamily: "monospace",
+                    fontSize: "0.82rem",
+                    color: "#00F0FF",
+                    lineHeight: 1.5,
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <code>{activeDemoItem.codeSnippet}</code>
+                </pre>
+              </div>
+            )}
+
+            {/* Modal Footer CTA */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "0.75rem", borderTop: "1px solid var(--glass-border)" }}>
+              <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                Need a similar custom project for your defense?
+              </span>
+              <button
+                type="button"
+                className="cta-button primary"
+                onClick={() => {
+                  closeDemoModal();
+                  onOpenModal("Complete Solution", activeDemoItem.title, activeDemoItem.category);
+                }}
+                style={{ background: "linear-gradient(135deg, #DC2626, #F59E0B)" }}
+              >
+                Order This Prototype (৳15,000 Package)
+              </button>
+            </div>
+          </div>
+        )}
+      </dialog>
+    </section>
+  );
+}
+
 export default function Home() {
   // Testimonial slider state
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slidesCount = 3;
+  const slidesCount = 4;
 
   // Dialog & Form states
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -554,12 +1023,14 @@ export default function Home() {
   });
 
   // Open modal
-  const openModal = (packageName?: string) => {
+  const openModal = (packageName?: string, prototypeTitle?: string, categoryVal?: string) => {
     resetFormState();
-    if (packageName) {
+    if (packageName || prototypeTitle) {
       setFormData((prev) => ({
         ...prev,
-        requirements: `Selected package: ${packageName}.\n\nRequirements outline:\n`,
+        title: prototypeTitle || prev.title,
+        category: categoryVal || prev.category,
+        requirements: packageName ? `Selected package: ${packageName}.\n\nRequirements outline:\n` : prev.requirements,
       }));
     }
     dialogRef.current?.showModal();
@@ -809,6 +1280,11 @@ export default function Home() {
                 </a>
               </li>
               <li>
+                <a href="#prototypes" className="nav-link" style={{ color: "var(--accent-gold-light)", fontWeight: 700 }}>
+                  Prototypes
+                </a>
+              </li>
+              <li>
                 <a href="#features" className="nav-link">
                   Categories
                 </a>
@@ -1009,6 +1485,9 @@ export default function Home() {
         {/* WHY TONG SOLUTIONS SECTION */}
         <WhyTongSolutionsSection onOpenModal={() => openModal()} />
 
+        {/* PROJECT PROTOTYPES & TEMPLATES SHOWCASE SECTION */}
+        <PrototypesShowcaseSection onOpenModal={openModal} />
+
         {/* HOW IT WORKS */}
         <section id="how-it-works" className="how-it-works-section">
           <div className="container">
@@ -1096,6 +1575,9 @@ export default function Home() {
                   <li>1 round of code modifications</li>
                   <li>GitHub repository access</li>
                   <li style={{ color: "var(--accent-gold-light)", fontStyle: "italic" }}>Report &amp; Slides available as add-ons</li>
+                  <li style={{ color: "#F59E0B", fontSize: "0.78rem", borderTop: "1px dashed rgba(255,255,255,0.12)", paddingTop: "0.5rem", marginTop: "0.4rem", lineHeight: 1.4 }}>
+                    ⚠️ Additional charges apply for extra or custom requirement types
+                  </li>
                 </ul>
                 <button
                   type="button"
@@ -1126,6 +1608,9 @@ export default function Home() {
                   <li>Interactive screen diagrams</li>
                   <li>3 rounds of modifications</li>
                   <li>Setup &amp; deployment support</li>
+                  <li style={{ color: "#F59E0B", fontSize: "0.78rem", borderTop: "1px dashed rgba(245,158,11,0.3)", paddingTop: "0.5rem", marginTop: "0.4rem", lineHeight: 1.4 }}>
+                    ⚠️ Additional charges apply for extra or custom requirement types
+                  </li>
                 </ul>
                 <button
                   type="button"
@@ -1156,6 +1641,9 @@ export default function Home() {
                   <li>Detailed code walkthrough &amp; setup guide</li>
                   <li>Revisions till supervisor approval</li>
                   <li>Direct developer support</li>
+                  <li style={{ color: "#F59E0B", fontSize: "0.78rem", borderTop: "1px dashed rgba(255,255,255,0.12)", paddingTop: "0.5rem", marginTop: "0.4rem", lineHeight: 1.4 }}>
+                    ⚠️ Additional charges apply for extra or custom requirement types
+                  </li>
                 </ul>
                 <button
                   type="button"
@@ -1165,6 +1653,11 @@ export default function Home() {
                   Get Started
                 </button>
               </article>
+            </div>
+
+            {/* Additional Charges Policy Banner */}
+            <div style={{ marginTop: "1.75rem", background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: "8px", padding: "0.85rem 1.25rem", color: "#F59E0B", fontSize: "0.85rem", textAlign: "center" }}>
+              <span>⚠️</span> <strong>Pricing Policy Note:</strong> Base package pricing covers standard university project scopes. Additional charges will be added for extra features, complex integrations, or non-standard requirement types.
             </div>
           </div>
         </section>
@@ -1190,15 +1683,12 @@ export default function Home() {
                 <div className="slide">
                   <div className="glass-panel testimonial-card">
                     <p className="testimonial-text">
-                      "I was completely lost with my machine learning final
-                      project. They built a superb facial recognition system and
-                      helped me write a report that secured an A+ grade. Highly
-                      recommended!"
+                      "I was completely stuck with my computer vision final project defense. Tong Solutions delivered a flawless real-time object tracking system with complete IEEE documentation that secured an A+ grade!"
                     </p>
                     <div className="student-info">
-                      <div className="student-name">Alex Johnson</div>
+                      <div className="student-name">Tanvir Ahmed</div>
                       <div className="student-details">
-                        B.Tech CS Graduate | MIT
+                        CSE Graduate | BUET
                       </div>
                     </div>
                   </div>
@@ -1207,14 +1697,12 @@ export default function Home() {
                 <div className="slide">
                   <div className="glass-panel testimonial-card">
                     <p className="testimonial-text">
-                      "The code was extremely clean and well-commented. The project
-                      book documentation and presentation slides saved us weeks of
-                      work. Superb experience."
+                      "The full bundle saved us! The source code was clean, well-structured, and the 40-page project book with ERDs and presentation slides made our final defense presentation effortless."
                     </p>
                     <div className="student-info">
-                      <div className="student-name">Sarah Rahman</div>
+                      <div className="student-name">Nusrat Jahan</div>
                       <div className="student-details">
-                        Software Eng Graduate | Stanford University
+                        Software Engineering | BRAC University
                       </div>
                     </div>
                   </div>
@@ -1223,14 +1711,27 @@ export default function Home() {
                 <div className="slide">
                   <div className="glass-panel testimonial-card">
                     <p className="testimonial-text">
-                      "Our team's smart cloud analytics project was selected as
-                      the best department project. We could not have done it
-                      without the detailed system diagrams and clean
-                      implementation."
+                      "Our smart IoT environmental monitoring prototype was selected as one of the top capstone projects in our department. Their hardware setup guides and code walkthroughs were top-notch!"
                     </p>
                     <div className="student-info">
-                      <div className="student-name">Daniel Kim</div>
-                      <div className="student-details">IT Graduate | NUS</div>
+                      <div className="student-name">Abrar Hossain</div>
+                      <div className="student-details">
+                        EEE &amp; IoT Graduate | SUST
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Slide 4 */}
+                <div className="slide">
+                  <div className="glass-panel testimonial-card">
+                    <p className="testimonial-text">
+                      "Tong Solutions helped turn our complex AI web app idea into a working product within just 10 days. The developer support during our supervisor review was exceptional!"
+                    </p>
+                    <div className="student-info">
+                      <div className="student-name">Samiul Islam</div>
+                      <div className="student-details">
+                        CSE Graduate | NSU
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1353,8 +1854,28 @@ export default function Home() {
               </a>
             </li>
           </ul>
-          <div className="footer-logo" style={{ marginBottom: '1.25rem' }}>
+          <div className="footer-logo" style={{ marginBottom: '0.75rem' }}>
             <img src="/logo-full.png" alt="Tong Solutions" className="footer-logo-image" />
+          </div>
+          <div style={{ marginBottom: '0.75rem' }}>
+            <a
+              href="https://www.facebook.com/tongsolutions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-facebook-link"
+              aria-label="Visit Tong Solutions on Facebook"
+            >
+              <svg
+                className="facebook-icon"
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="currentColor"
+              >
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              <span>Follow Us on Facebook</span>
+            </a>
           </div>
           <p>
             &copy; 2026 Tong Solutions. Built with pride for engineering students.
