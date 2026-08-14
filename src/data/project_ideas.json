@@ -1,0 +1,47 @@
+[
+  {
+    "_id": "submission_001",
+    "id": "submission_001",
+    "name": "Tariqul Islam",
+    "email": "tariq.buet@gmail.com",
+    "phone": "01712345678",
+    "university": "BUET",
+    "category": "ai-ml",
+    "title": "AI-Driven Satellite Crop Disease Diagnostic Engine",
+    "timeline": "3-weeks",
+    "requirements": "Machine learning pipeline using ResNet50 for leaf disease detection with PyTorch backend and Next.js web portal.",
+    "budget": 15000,
+    "status": "In Consultation",
+    "submittedAt": "2026-08-14T10:00:00.000Z"
+  },
+  {
+    "_id": "submission_002",
+    "id": "submission_002",
+    "name": "Nusrat Jahan",
+    "email": "nusrat.brac@gmail.com",
+    "phone": "01819203040",
+    "university": "BRAC University",
+    "category": "web",
+    "title": "E-Healthcare Electronic Health Record Platform",
+    "timeline": "2-weeks",
+    "requirements": "Secure EHR portal with role-based access control (Doctor, Patient, Lab Tech) and automated prescription generator.",
+    "budget": 20000,
+    "status": "Pending Review",
+    "submittedAt": "2026-08-14T11:30:00.000Z"
+  },
+  {
+    "_id": "submission_003",
+    "id": "submission_003",
+    "name": "Samiul Hasan",
+    "email": "samiul.sust@gmail.com",
+    "phone": "01911223344",
+    "university": "SUST",
+    "category": "iot",
+    "title": "Smart Microgrid Solar Power Monitoring IoT Node",
+    "timeline": "1-month",
+    "requirements": "Hardware integration with ESP32, INA219 current sensor, and MQTT broker feeding live dashboard graphics.",
+    "budget": 15000,
+    "status": "Accepted",
+    "submittedAt": "2026-08-14T12:15:00.000Z"
+  }
+]
