@@ -90,14 +90,48 @@ export default function AdminDashboard() {
     loadProposals();
   }, []);
 
-  const loadProposals = () => {
+  const loadProposals = async () => {
     try {
+      // 1. Fetch live MongoDB submissions from API route
+      let mongoList: Proposal[] = [];
+      try {
+        const res = await fetch("/api/project-ideas");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.ideas)) {
+          mongoList = data.ideas.map((item: any) => ({
+            id: item._id || item.id || Math.random().toString(36).substring(2, 9),
+            name: item.name,
+            email: item.email,
+            phone: item.phone,
+            university: item.university,
+            category: item.category,
+            title: item.title,
+            timeline: item.timeline,
+            requirements: item.requirements,
+            budget: item.budget || 15000,
+            timestamp: item.submittedAt || item.timestamp || new Date().toISOString(),
+            status: item.status || "Pending Review",
+          }));
+        }
+      } catch (e) {
+        console.warn("Could not fetch MongoDB ideas directly:", e);
+      }
+
+      // 2. Fetch localStorage submissions fallback
+      let localList: Proposal[] = [];
       const stored = localStorage.getItem("tong_solutions_proposals");
       if (stored) {
-        setProposals(JSON.parse(stored));
-      } else {
-        setProposals([]);
+        localList = JSON.parse(stored);
       }
+
+      // Combine MongoDB & localStorage data
+      const combinedMap = new Map<string, Proposal>();
+      mongoList.forEach((p) => combinedMap.set(p.id, p));
+      localList.forEach((p) => {
+        if (!combinedMap.has(p.id)) combinedMap.set(p.id, p);
+      });
+
+      setProposals(Array.from(combinedMap.values()));
     } catch (err) {
       console.error("Failed to load proposals:", err);
     }

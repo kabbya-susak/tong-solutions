@@ -1190,27 +1190,42 @@ export default function Home() {
     }
   };
 
-  // Simulated Submit with localStorage saving
-  const submitProposal = () => {
+  // Submit proposal to MongoDB database & localStorage fallback
+  const submitProposal = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      try {
-        const newProposal = {
-          id: Math.random().toString(36).substring(2, 9),
-          timestamp: new Date().toISOString(),
-          status: "Pending Review",
-          ...formData
-        };
-        const existing = localStorage.getItem("tong_solutions_proposals");
-        const list = existing ? JSON.parse(existing) : [];
-        list.push(newProposal);
-        localStorage.setItem("tong_solutions_proposals", JSON.stringify(list));
-      } catch (err) {
-        console.error("Error saving proposal to localStorage:", err);
+    try {
+      // POST to MongoDB Atlas via Next.js API Route
+      const response = await fetch("/api/project-ideas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        console.warn("MongoDB API Notice:", result.error);
       }
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 1200);
+    } catch (err) {
+      console.error("Error posting to MongoDB:", err);
+    }
+
+    try {
+      const newProposal = {
+        id: Math.random().toString(36).substring(2, 9),
+        timestamp: new Date().toISOString(),
+        status: "Pending Review",
+        ...formData
+      };
+      const existing = localStorage.getItem("tong_solutions_proposals");
+      const list = existing ? JSON.parse(existing) : [];
+      list.push(newProposal);
+      localStorage.setItem("tong_solutions_proposals", JSON.stringify(list));
+    } catch (err) {
+      console.error("Error saving proposal to localStorage:", err);
+    }
+
+    setIsSubmitting(false);
+    setIsSubmitted(true);
   };
 
   // Escape key handler reset
