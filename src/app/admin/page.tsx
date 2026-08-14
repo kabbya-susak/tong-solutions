@@ -30,7 +30,7 @@ const MOCK_PROPOSALS: Proposal[] = [
     timeline: "3-weeks",
     requirements: "Machine learning pipeline using ResNet50 for leaf disease detection with PyTorch backend and Next.js web portal.",
     budget: 15000,
-    timestamp: new Date(Date.now() - 4 * 3600000).toISOString(),
+    timestamp: "2026-08-14T10:00:00.000Z",
     status: "In Consultation",
   },
   {
@@ -44,7 +44,7 @@ const MOCK_PROPOSALS: Proposal[] = [
     timeline: "2-weeks",
     requirements: "Secure EHR portal with role-based access control (Doctor, Patient, Lab Tech) and automated prescription generator.",
     budget: 20000,
-    timestamp: new Date(Date.now() - 24 * 3600000).toISOString(),
+    timestamp: "2026-08-13T14:30:00.000Z",
     status: "Pending Review",
   },
   {
@@ -58,7 +58,7 @@ const MOCK_PROPOSALS: Proposal[] = [
     timeline: "1-month",
     requirements: "Hardware integration with ESP32, INA219 current sensor, and MQTT broker feeding live dashboard graphics.",
     budget: 15000,
-    timestamp: new Date(Date.now() - 3 * 86400000).toISOString(),
+    timestamp: "2026-08-11T09:15:00.000Z",
     status: "Accepted",
   },
   {
@@ -72,7 +72,7 @@ const MOCK_PROPOSALS: Proposal[] = [
     timeline: "2-weeks",
     requirements: "E-commerce platform for university students to exchange project books and hardware components.",
     budget: 10000,
-    timestamp: new Date(Date.now() - 7 * 86400000).toISOString(),
+    timestamp: "2026-08-07T16:45:00.000Z",
     status: "Archived",
   }
 ];
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
   // RENDER SECURITY LOGIN LOCKSCREEN IF NOT AUTHENTICATED
   if (!isAuthenticated) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--bg-main)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
+      <div suppressHydrationWarning style={{ minHeight: "100vh", background: "var(--bg-main)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
         <div className="hud-card" style={{ maxWidth: "440px", width: "100%", padding: "2rem", background: "rgba(8, 12, 22, 0.95)", border: "1px solid var(--accent-cyan)", borderRadius: "16px", boxShadow: "0 0 35px rgba(0, 240, 255, 0.25)", position: "relative" }}>
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: "1.75rem" }}>
@@ -378,37 +378,39 @@ export default function AdminDashboard() {
           <form onSubmit={handleLoginSubmit}>
             <div style={{ marginBottom: "1.25rem" }}>
               <label style={{ display: "block", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.4rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Admin Username
+                Administrator Username
               </label>
               <input
                 type="text"
-                required
+                className="form-control"
                 placeholder="Enter admin username"
+                required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(0, 0, 0, 0.5)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "#FFF", fontSize: "0.95rem", outline: "none" }}
+                style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(0,0,0,0.5)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "#FFF" }}
               />
             </div>
 
             <div style={{ marginBottom: "1.5rem" }}>
               <label style={{ display: "block", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.4rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Admin Password
+                Password
               </label>
               <div style={{ position: "relative" }}>
                 <input
                   type={showPassword ? "text" : "password"}
+                  className="form-control"
+                  placeholder="Enter password"
                   required
-                  placeholder="Enter admin password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(0, 0, 0, 0.5)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "#FFF", fontSize: "0.95rem", outline: "none" }}
+                  style={{ width: "100%", padding: "0.75rem 2.75rem 0.75rem 1rem", background: "rgba(0,0,0,0.5)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "#FFF" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--text-muted)", fontSize: "0.85rem", cursor: "pointer" }}
+                  style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "0.9rem" }}
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? "👁️" : "🔒"}
                 </button>
               </div>
             </div>
@@ -435,7 +437,7 @@ export default function AdminDashboard() {
 
   // RENDER ADMIN DASHBOARD WHEN AUTHENTICATED
   return (
-    <div className="admin-page-container" style={{ minHeight: "100vh", background: "var(--bg-main)" }}>
+    <div suppressHydrationWarning className="admin-page-container" style={{ minHeight: "100vh", background: "var(--bg-main)" }}>
       {/* Header Bar */}
       <header className="main-header" style={{ borderBottom: "1px solid var(--glass-border)", background: "rgba(5,7,12,0.9)" }}>
         <div className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBlock: "1rem" }}>

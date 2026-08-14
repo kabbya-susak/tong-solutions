@@ -1324,7 +1324,7 @@ export default function Home() {
   }, []);
 
   return (
-    <>
+    <div suppressHydrationWarning>
       {/* Background Interactive Particle Canvas */}
       <ArcReactorCanvas />
 
@@ -2373,6 +2373,6 @@ export default function Home() {
           </div>
         )}
       </dialog>
-    </>
+    </div>
   );
 }
