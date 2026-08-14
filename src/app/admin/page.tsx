@@ -99,6 +99,7 @@ export default function AdminDashboard() {
 
   // Check saved authentication session on mount
   useEffect(() => {
+    document.title = "Tong Solutions - Admin Portal";
     const savedAuth = sessionStorage.getItem("tong_admin_session");
     if (savedAuth === "tong_admin_session_valid") {
       setIsAuthenticated(true);
