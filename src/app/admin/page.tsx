@@ -78,6 +78,15 @@ const MOCK_PROPOSALS: Proposal[] = [
 ];
 
 export default function AdminDashboard() {
+  // Authentication states
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  // Dashboard states
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -88,9 +97,53 @@ export default function AdminDashboard() {
   
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  // Check saved authentication session on mount
   useEffect(() => {
-    loadProposals();
+    const savedAuth = sessionStorage.getItem("tong_admin_session");
+    if (savedAuth === "tong_admin_session_valid") {
+      setIsAuthenticated(true);
+      loadProposals();
+    } else {
+      setIsLoading(false);
+    }
   }, []);
+
+  // Handle Login Submit
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    setIsAuthenticating(true);
+
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        sessionStorage.setItem("tong_admin_session", "tong_admin_session_valid");
+        setIsAuthenticated(true);
+        loadProposals();
+      } else {
+        setLoginError(data.error || "Invalid login credentials.");
+      }
+    } catch (err) {
+      setLoginError("Failed to connect to authentication server.");
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  // Handle Logout
+  const handleLogout = () => {
+    sessionStorage.removeItem("tong_admin_session");
+    setIsAuthenticated(false);
+    setUsername("");
+    setPassword("");
+  };
 
   // Fetch proposals from MongoDB & local fallback
   const loadProposals = async () => {
@@ -122,7 +175,6 @@ export default function AdminDashboard() {
         setDbStatus("error");
       }
 
-      // Local storage fallback sync
       let localList: Proposal[] = [];
       try {
         const stored = localStorage.getItem("tong_solutions_proposals");
@@ -133,7 +185,6 @@ export default function AdminDashboard() {
         console.error("Local storage read error:", e);
       }
 
-      // Combine list without duplicates
       const combinedMap = new Map<string, Proposal>();
       mongoList.forEach((p) => combinedMap.set(p.id, p));
       localList.forEach((p) => {
@@ -171,7 +222,6 @@ export default function AdminDashboard() {
   // Update status in MongoDB
   const updateProposalStatus = async (id: string, newStatus: string) => {
     try {
-      // Optimistic state update
       const updated = proposals.map((p) => {
         if (p.id === id || p._id === id) {
           const u = { ...p, status: newStatus };
@@ -185,7 +235,6 @@ export default function AdminDashboard() {
       setProposals(updated);
       localStorage.setItem("tong_solutions_proposals", JSON.stringify(updated));
 
-      // Sync with MongoDB API
       await fetch("/api/project-ideas", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -208,7 +257,6 @@ export default function AdminDashboard() {
           closeModal();
         }
 
-        // Delete from MongoDB API
         await fetch(`/api/project-ideas?id=${encodeURIComponent(id)}`, {
           method: "DELETE",
         });
@@ -293,15 +341,99 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Pending Review": return "hsl(200, 100%, 55%)"; // Sky Cyan
-      case "In Consultation": return "hsl(40, 100%, 50%)"; // Amber Gold
-      case "Accepted": return "hsl(140, 70%, 45%)"; // Emerald Green
-      case "Completed": return "hsl(280, 80%, 65%)"; // Cyber Purple
-      case "Archived": return "hsl(215, 20%, 55%)"; // Slate Muted
+      case "Pending Review": return "hsl(200, 100%, 55%)";
+      case "In Consultation": return "hsl(40, 100%, 50%)";
+      case "Accepted": return "hsl(140, 70%, 45%)";
+      case "Completed": return "hsl(280, 80%, 65%)";
+      case "Archived": return "hsl(215, 20%, 55%)";
       default: return "inherit";
     }
   };
 
+  // RENDER SECURITY LOGIN LOCKSCREEN IF NOT AUTHENTICATED
+  if (!isAuthenticated) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--bg-main)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem" }}>
+        <div className="hud-card" style={{ maxWidth: "440px", width: "100%", padding: "2rem", background: "rgba(8, 12, 22, 0.95)", border: "1px solid var(--accent-cyan)", borderRadius: "16px", boxShadow: "0 0 35px rgba(0, 240, 255, 0.25)", position: "relative" }}>
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: "1.75rem" }}>
+            <div style={{ marginBottom: "0.75rem" }}>
+              <img src="/logo-full.png" alt="Tong Solutions" style={{ height: "42px", filter: "drop-shadow(0 0 12px rgba(0,240,255,0.5))" }} />
+            </div>
+            <span className="tong-badge tong-badge-cyan" style={{ fontSize: "0.75rem", marginBottom: "0.5rem" }}>
+              <span>🔐 ADMIN SECURITY LOCKSCREEN</span>
+            </span>
+            <h2 style={{ fontSize: "1.4rem", color: "#FFF", marginTop: "0.25rem" }}>Admin Portal Authentication</h2>
+            <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>Please enter administrator credentials to access client submissions telemetry.</p>
+          </div>
+
+          {/* Error Notice */}
+          {loginError && (
+            <div style={{ background: "rgba(220, 38, 38, 0.15)", border: "1px solid #DC2626", color: "#EF4444", borderRadius: "8px", padding: "0.75rem 1rem", fontSize: "0.85rem", marginBottom: "1.25rem", textAlign: "center" }}>
+              ⚠️ {loginError}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleLoginSubmit}>
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{ display: "block", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.4rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                Admin Username
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Enter admin username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(0, 0, 0, 0.5)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "#FFF", fontSize: "0.95rem", outline: "none" }}
+              />
+            </div>
+
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label style={{ display: "block", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.4rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                Admin Password
+              </label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="Enter admin password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(0, 0, 0, 0.5)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "#FFF", fontSize: "0.95rem", outline: "none" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "var(--text-muted)", fontSize: "0.85rem", cursor: "pointer" }}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isAuthenticating}
+              className="cta-button primary"
+              style={{ width: "100%", padding: "0.85rem", fontSize: "1rem", fontWeight: 700, borderRadius: "8px", background: "linear-gradient(135deg, #00F0FF, #0072FF)", boxShadow: "0 0 20px rgba(0,240,255,0.4)" }}
+            >
+              {isAuthenticating ? "Authenticating..." : "🔓 Unlock Admin Panel"}
+            </button>
+          </form>
+
+          {/* Credentials Helper Badge */}
+          <div style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px dashed var(--glass-border)", textAlign: "center", fontSize: "0.78rem", color: "var(--accent-gold-light)" }}>
+            ℹ️ <strong>Default Credentials:</strong><br />
+            Username: <code style={{ color: "#00F0FF" }}>admin</code> | Password: <code style={{ color: "#00F0FF" }}>tong2026password</code>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // RENDER ADMIN DASHBOARD WHEN AUTHENTICATED
   return (
     <div className="admin-page-container" style={{ minHeight: "100vh", background: "var(--bg-main)" }}>
       {/* Header Bar */}
@@ -315,9 +447,16 @@ export default function AdminDashboard() {
               <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: dbStatus === "connected" ? "#10B981" : "#F59E0B", display: "inline-block", boxShadow: `0 0 8px ${dbStatus === "connected" ? "#10B981" : "#F59E0B"}` }}></span>
               {dbStatus === "connected" ? "MongoDB Atlas Connected" : "Syncing DB..."}
             </span>
-            <a href="/" className="cta-button secondary" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem", border: "1px solid var(--accent-cyan)", color: "var(--accent-cyan)", textDecoration: "none" }}>
-              ← Return to Site
+            <a href="/" className="cta-button secondary" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem", border: "1px solid var(--glass-border)", color: "var(--text-muted)", textDecoration: "none" }}>
+              ← Site Home
             </a>
+            <button
+              onClick={handleLogout}
+              className="cta-button secondary"
+              style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem", border: "1px solid #DC2626", color: "#EF4444" }}
+            >
+              🔒 Log Out
+            </button>
           </div>
         </div>
       </header>
@@ -584,7 +723,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Quick Status Updater */}
             <div style={{ marginBottom: "1.25rem", paddingTop: "0.75rem", borderTop: "1px solid var(--glass-border)" }}>
               <span style={{ display: "block", fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>UPDATE STATUS</span>
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
