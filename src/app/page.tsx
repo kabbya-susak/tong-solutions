@@ -1141,6 +1141,53 @@ export default function Home() {
     return !errorMsg;
   };
 
+  // Auto-focus first field when step changes
+  useEffect(() => {
+    if (dialogRef.current && dialogRef.current.open && !isSubmitted) {
+      const timer = setTimeout(() => {
+        if (activeStepIdx === 0) {
+          document.getElementById("student-name")?.focus();
+        } else if (activeStepIdx === 1) {
+          document.getElementById("project-category")?.focus();
+        } else if (activeStepIdx === 2) {
+          document.getElementById("project-requirements")?.focus();
+        }
+      }, 60);
+      return () => clearTimeout(timer);
+    }
+  }, [activeStepIdx, isSubmitted]);
+
+  // Enter key navigation handler between input boxes & final submission
+  const handleKeyDown = (
+    e: React.KeyboardEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+    nextFieldId?: string
+  ) => {
+    if (e.key === "Enter") {
+      // Allow Shift+Enter inside textarea for multi-line text
+      if (e.currentTarget.tagName === "TEXTAREA" && e.shiftKey) {
+        return;
+      }
+
+      e.preventDefault();
+      const { name, value } = e.currentTarget;
+
+      if (nextFieldId) {
+        const isValid = validateField(name, value);
+        if (isValid) {
+          const nextEl = document.getElementById(nextFieldId);
+          if (nextEl) {
+            nextEl.focus();
+          }
+        }
+      } else {
+        // Triggers next step or final submit if on the last input
+        handleNextStep();
+      }
+    }
+  };
+
   // Handle blur validation
   const handleBlur = (
     e: React.FocusEvent<
@@ -1979,6 +2026,7 @@ export default function Home() {
                   value={formData.name}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e, "student-email")}
                 />
                 <span
                   className="validation-error"
@@ -2007,6 +2055,7 @@ export default function Home() {
                   value={formData.email}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e, "student-phone")}
                 />
                 <span
                   className="validation-error"
@@ -2035,6 +2084,7 @@ export default function Home() {
                   value={formData.phone}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e, "student-uni")}
                 />
                 <span
                   className="validation-error"
@@ -2064,6 +2114,7 @@ export default function Home() {
                   value={formData.university}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e)}
                 />
                 <span
                   className="validation-error"
@@ -2100,6 +2151,7 @@ export default function Home() {
                   value={formData.category}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e, "project-title")}
                 >
                   <option value="" disabled>
                     Select category...
@@ -2136,6 +2188,7 @@ export default function Home() {
                   value={formData.title}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e, "project-timeline")}
                 />
                 <span
                   className="validation-error"
@@ -2163,6 +2216,7 @@ export default function Home() {
                   value={formData.timeline}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e)}
                 >
                   <option value="" disabled>
                     Select timeline...
@@ -2212,10 +2266,11 @@ export default function Home() {
                   value={formData.requirements}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
+                  onKeyDown={(e) => handleKeyDown(e)}
                 />
                 <span className="form-help-text">
                   Provide as much detail as possible to get an accurate scope
-                  analysis.
+                  analysis. (Press Enter to submit final proposal)
                 </span>
                 <span
                   className="validation-error"
@@ -2243,6 +2298,7 @@ export default function Home() {
                   value={formData.budget}
                   style={{ width: "100%" }}
                   onChange={handleBudgetChange}
+                  onKeyDown={(e) => handleKeyDown(e)}
                 />
                 <div
                   style={{
