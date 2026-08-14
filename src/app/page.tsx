@@ -1868,6 +1868,11 @@ export default function Home() {
                 Pricing
               </a>
             </li>
+            <li>
+              <a href="/admin" className="footer-link" style={{ color: "var(--accent-cyan)", fontWeight: 600 }}>
+                🔐 Admin Panel
+              </a>
+            </li>
           </ul>
           <div className="footer-logo" style={{ marginBottom: '0.75rem' }}>
             <img src="/logo-full.png" alt="Tong Solutions" className="footer-logo-image" />
